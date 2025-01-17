@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Manga.Application.Common.Interfaces;
+using Manga.Application.Common.Mappings;
 using Manga.Application.Common.Models;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
@@ -23,13 +24,13 @@ public class MetricHub(IApplicationDbContext context, ILogger logger, IMapper ma
                 _logger.Warning("No system detail found for the machine: {MachineName}", Environment.MachineName);
                 return;
             }
-            var systemUsage = _context.SystemUsages.OrderBy(x => x.Created).FirstOrDefaultAsync(x => x.Id == systemdetail.Id);
-
-            var model = _mapper.Map<SystemUsageModel>(systemdetail);
+            var systemUsage = await _context.SystemUsages
+                .Where(x => x.Created >= DateTimeOffset.UtcNow.AddMinutes(-6))
+                .OrderBy(x => x.Created).ProjectToListAsync<SystemUsageModel>(_mapper.ConfigurationProvider);
 
             if (_collectSystemUsage.IsLiveDataEnabled)
             {
-                await Clients.All.ReceiveSystemUsage(model);
+                await Clients.All.GetOldData(systemUsage);
             }
             await Clients.All.ReceiveRunningStatus(_collectSystemUsage.IsLiveDataEnabled);
         }
