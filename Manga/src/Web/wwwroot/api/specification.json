@@ -37,6 +37,51 @@
         }
       }
     },
+    "/api/Metrics/GetHistoricalDataOfSystemUsage": {
+      "get": {
+        "tags": [
+          "Metrics"
+        ],
+        "operationId": "GetHistoricalDataOfSystemUsage",
+        "parameters": [
+          {
+            "name": "startDate",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "x-position": 1
+          },
+          {
+            "name": "endDate",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "x-position": 2
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/SystemUsageModel"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/TodoItems": {
       "get": {
         "tags": [
@@ -819,6 +864,40 @@
             "items": {
               "type": "string"
             }
+          }
+        }
+      },
+      "SystemUsageModel": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "cpuUsagePercentage": {
+            "type": "number",
+            "format": "double"
+          },
+          "memoryUsagePercentage": {
+            "type": "number",
+            "format": "double"
+          },
+          "networkBytesSent": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "networkBytesReceived": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "diskReadBytes": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "diskWriteBytes": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "timeStamp": {
+            "type": "string",
+            "format": "date-time"
           }
         }
       },

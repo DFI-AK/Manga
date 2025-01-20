@@ -47,6 +47,7 @@ internal sealed class CollectSystemUsage(IServiceScopeFactory scope, IHubContext
             {
                 var (CpuUsage, MemoryUsage, DiskRead, DiskWrite) = _systemProcessingService.GetSystemUsage();
                 var (BytesSent, BytesReceived) = _systemProcessingService.GetNetworkUsage();
+                var details = _systemProcessingService.GetSystemDetail();
 
                 var usageEntity = new SystemUsage()
                 {
@@ -70,6 +71,15 @@ internal sealed class CollectSystemUsage(IServiceScopeFactory scope, IHubContext
                 }
 
                 await _hubContext.Clients.All.ReceiveRunningStatus(IsLiveDataEnabled);
+                await _hubContext.Clients.All.GetSystenDetails(new()
+                {
+                    Architecture = details.Architecture,
+                    FreeMemoryKB = details.FreeMemoryKB,
+                    MachineName = details.MachineName,
+                    OSVersion = details.OSVersion,
+                    ProcessorCount = details.ProcessorCount,
+                    TotalMemoryKB = details.TotalMemoryKB
+                });
 
                 _logger.Information("Metrics collected successfully.");
 
