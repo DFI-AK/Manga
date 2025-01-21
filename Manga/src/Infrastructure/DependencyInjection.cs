@@ -1,5 +1,4 @@
-﻿using System.Runtime.Versioning;
-using Manga.Application.Common.Interfaces;
+﻿using Manga.Application.Common.Interfaces;
 using Manga.Domain.Constants;
 using Manga.Infrastructure.BackgrounServices;
 using Manga.Infrastructure.Data;
@@ -39,7 +38,20 @@ public static class DependencyInjection
         builder.Services.AddScoped<ApplicationDbContextInitialiser>();
 
         builder.Services.AddAuthentication()
-            .AddBearerToken(IdentityConstants.BearerScheme);
+            .AddBearerToken(IdentityConstants.BearerScheme, opt =>
+            {
+                opt.Events.OnMessageReceived = context =>
+                {
+                    var accessToken = context.Request.Query["access_token"];
+                    var path = context.HttpContext.Request.Path;
+
+                    if (!string.IsNullOrEmpty(accessToken) && path.StartsWithSegments("/api"))
+                    {
+                        context.Token = accessToken;
+                    }
+                    return Task.CompletedTask;
+                };
+            });
 
         builder.Services.AddAuthorizationBuilder();
 

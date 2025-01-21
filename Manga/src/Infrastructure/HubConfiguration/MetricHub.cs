@@ -8,16 +8,25 @@ using Microsoft.Extensions.DependencyInjection;
 using Serilog;
 
 namespace Manga.Infrastructure.HubConfiguration;
+
 public class MetricHub(IApplicationDbContext context, ILogger logger, IMapper mapper, IServiceScopeFactory scope) : Hub<IMetricHub>
 {
     private readonly IApplicationDbContext _context = context;
     private readonly ILogger _logger = logger.ForContext<MetricHub>();
     private readonly IMapper _mapper = mapper;
     private readonly ICollectSystemUsage _collectSystemUsage = scope.CreateScope().ServiceProvider.GetRequiredService<ICollectSystemUsage>();
+
     public override async Task OnConnectedAsync()
     {
         try
         {
+            var userId = Context.UserIdentifier;
+
+            if (!string.IsNullOrEmpty(userId))
+            {
+                _logger.Information("User id from Hub : {userId}", userId);
+            }
+
             var systemdetail = await _context.SystemDetails.FirstOrDefaultAsync(x => x.MachineName == Environment.MachineName);
             if (systemdetail == null)
             {

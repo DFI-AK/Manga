@@ -62,21 +62,27 @@ public class ApplicationDbContextInitialiser(ILogger<ApplicationDbContextInitial
     {
         // Default roles
         var administratorRole = new IdentityRole(Roles.Administrator);
+        var userRole = new IdentityRole(Roles.User);
 
         if (_roleManager.Roles.All(r => r.Name != administratorRole.Name))
         {
             await _roleManager.CreateAsync(administratorRole);
         }
 
+        if (_roleManager.Roles.All(r => r.Name != userRole.Name))
+        {
+            await _roleManager.CreateAsync(userRole);
+        }
+
         // Default users
-        var administrator = new ApplicationUser { UserName = "administrator@localhost", Email = "administrator@localhost" };
+        var administrator = new ApplicationUser { UserName = "ayush@demo.com", Email = "ayush@demo.com" };
 
         if (_userManager.Users.All(u => u.UserName != administrator.UserName))
         {
-            await _userManager.CreateAsync(administrator, "Administrator1!");
-            if (!string.IsNullOrWhiteSpace(administratorRole.Name))
+            await _userManager.CreateAsync(administrator, "Test@123");
+            if (!string.IsNullOrWhiteSpace(userRole.Name))
             {
-                await _userManager.AddToRolesAsync(administrator, new[] { administratorRole.Name });
+                await _userManager.AddToRolesAsync(administrator, [userRole.Name]);
             }
         }
 
