@@ -2,6 +2,8 @@
 using Manga.Application.Common.Interfaces;
 using Manga.Application.Common.Mappings;
 using Manga.Application.Common.Models;
+using Manga.Domain.Constants;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -9,6 +11,7 @@ using Serilog;
 
 namespace Manga.Infrastructure.HubConfiguration;
 
+[Authorize(AuthenticationSchemes = Env.AuthorizeSchema)]
 public class MetricHub(IApplicationDbContext context, ILogger logger, IMapper mapper, IServiceScopeFactory scope) : Hub<IMetricHub>
 {
     private readonly IApplicationDbContext _context = context;

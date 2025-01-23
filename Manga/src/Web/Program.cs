@@ -28,6 +28,8 @@ else
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseCors(Env.CorsPolicy);
+app.UseAuthentication();
+app.UseAuthorization();
 
 app.UseSwaggerUi(settings =>
 {
